@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <title>いろいろな声質のデモ | Web Speech API -> speechSynthesis</title>
+    <link rel='stylesheet' href='demo.css' type='text/css'/>
+  </head>
+  <body>
+<input class="text" value="Let's use Web Speech API"/><br/>
+<script>
+
+var voices = speechSynthesis.getVoices();
+function fetchVoices(cb){
+  if(!voices || !voices.length){
+    setTimeout(function(){
+      voices = speechSynthesis.getVoices();
+      fetchVoices(cb);
+    }, 0);
+  }
+  else{
+    cb(voices);
+  }
+}
+
+function drawButtons(voices){
+  voices.forEach(function(voice){
+    var elBtn = document.createElement('button');
+    elBtn.textContent = voice.name;
+    elBtn.addEventListener('click', function(){
+      speak(this.textContent);
+    });
+    document.body.appendChild(elBtn);
+  });
+}
+
+function speak(voiceName){
+  var text = document.querySelector('.text').value;
+  var uttr = new SpeechSynthesisUtterance(text);
+
+  // 音声データを取得できてない場合は再取得する
+  if(!voices || !voices.length){
+    voices = speechSynthesis.getVoices();
+  }
+  voices.forEach(function(v, i){
+    if(v.name == voiceName) uttr.voice = v;
+  });
+  speechSynthesis.cancel();
+  speechSynthesis.speak(uttr);
+}
+
+fetchVoices(drawButtons);
+</script>
+
+
+  </body>
+</html>

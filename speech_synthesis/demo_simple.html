@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <title>シンプルなデモ | Web Speech API -> speechSynthesis</title>
+    <link rel='stylesheet' href='demo.css' type='text/css'/>
+  </head>
+  <body>
+<h1>シンプルなデモ</h1>
+<input class="text" value="Web Speech API を使ってみよう！"/>
+<button onclick="speak()">speak()</button>
+<script>
+function speak(){
+  var text = document.querySelector('.text').value;
+  speechSynthesis.speak(
+    new SpeechSynthesisUtterance(text)
+  );
+}
+</script>
+
+
+  </body>
+</html>

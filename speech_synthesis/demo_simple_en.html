@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <title>言語指定のデモ | Web Speech API -> speechSynthesis</title>
+    <link rel='stylesheet' href='demo.css' type='text/css'/>
+  </head>
+  <body>
+<h1>言語指定のデモ</h1>
+<input class="text" value="Let's use Web Speech API"/>
+<label><input class="en" type="checkbox" checked/>English</label>
+<button onclick="speak()">speak()</button>
+<script>
+function speak(){
+  var text = document.querySelector('.text').value;
+  var en = document.querySelector('.en').checked;
+  var uttr = new SpeechSynthesisUtterance();
+  uttr.text = text;
+  if(en){
+    uttr.lang = 'en-US';
+  }
+  speechSynthesis.speak(uttr);
+}
+</script>
+
+
+  </body>
+</html>

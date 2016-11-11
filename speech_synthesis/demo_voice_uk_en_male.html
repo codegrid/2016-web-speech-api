@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <title>イギリス人男性風の音声のデモ | Web Speech API -> speechSynthesis</title>
+    <link rel='stylesheet' href='demo.css' type='text/css'/>
+  </head>
+  <body>
+<h1>イギリス人男性風の音声のデモ</h1>
+<input class="text" value="Let's use Web Speech API"/>
+<button onclick="speak()">speak()</button>
+<script>
+
+//====================================
+// voiceオブジェクトの取得処理
+//====================================
+// ①初回は空の配列が返される（バグ）
+var voices = speechSynthesis.getVoices();
+
+function getVoice(voiceName){
+
+  // ②声質データを取得できてない場合は再取得する
+  if(!voices || !voices.length){
+    voices = speechSynthesis.getVoices();
+  }
+  var voice;
+  voices.forEach(function(_voice){
+
+    // ③指定された声質名か？
+    if(_voice.name === voiceName) voice = _voice;
+  });
+  return voice;
+}
+
+//====================================
+// 音声再生処理
+//====================================
+function speak(){
+  var text = document.querySelector('.text').value;
+  var uttr = new SpeechSynthesisUtterance(text);
+
+  //「イギリス人男性風の声質」を指定
+  var voice = getVoice('Google UK English Male');
+
+  // 取得できた場合のみ適用する
+  if(voice){
+    uttr.voice = voice;
+  }
+  speechSynthesis.speak(uttr);
+}
+
+/**
+  画面ロード未完状態でspeak()したい場合は以下のようにする
+  fetchVoices(function(){
+    ...
+    speechSynthesis.speak(uttr);
+  });
+*/
+function fetchVoices(cb){
+  if(!voices || !voices.length){
+    setTimeout(function(){
+      voices = speechSynthesis.getVoices();
+      fetchVoices(cb);
+    }, 0);
+  }
+  else{
+    !cb || cb(voices);
+  }
+}
+fetchVoices();
+
+
+
+
+
+
+</script>
+
+
+  </body>
+</html>

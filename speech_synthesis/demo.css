@@ -1,0 +1,13 @@
+button{
+  padding: 8px;
+  margin: 2px;
+  min-width: 100px;
+}
+
+.text{
+  padding: 8px;
+  width: 300px;
+}
+.count{
+  width: 30px;
+}

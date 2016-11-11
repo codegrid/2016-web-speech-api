@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <title>動作をコントロールするデモ | Web Speech API -> speechSynthesis</title>
+    <link rel='stylesheet' href='demo.css' type='text/css'/>
+  </head>
+  <body>
+<h1>動作をコントロールするデモ</h1>
+<input class="text" value="web speech api を使ってみよう！"/><br/>
+<button onclick="speak()">speak()</button>
+<button onclick="pause()">pause()</button>
+<button onclick="resume()">resume()</button>
+<button onclick="cancel()">cancel()</button>
+
+<h2>state</h2>
+<ul>
+  <li>speechSynthesis.speaking: <span class="speakingState"></span></li>
+  <li>speechSynthesis.paused: <span class="pausedState"></span></li>
+  <li>speechSynthesis.pending: <span class="pendingState"></span></li>
+</ul>
+
+<script>
+var el = {
+  state: {
+    speaking: document.querySelector('.speakingState'),
+    paused: document.querySelector('.pausedState'),
+    pending: document.querySelector('.pendingState')
+  }
+};
+
+var uttr;
+function speak(){
+  var text = document.querySelector('.text').value;
+  uttr = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(uttr);
+}
+function pause(){
+  speechSynthesis.pause();
+}
+function resume(){
+  speechSynthesis.resume();
+}
+function cancel(){
+  speechSynthesis.cancel();
+}
+function showState(){
+  setTimeout(function(){
+    el.state.speaking.textContent = speechSynthesis.speaking;
+    el.state.paused.textContent = speechSynthesis.paused;
+    el.state.pending.textContent = speechSynthesis.pending;
+  }, 300);
+}
+setInterval(showState,300);
+
+</script>
+
+
+  </body>
+</html>
