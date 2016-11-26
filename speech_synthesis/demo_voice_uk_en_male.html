@@ -18,12 +18,17 @@
 //====================================
 // ①初回は空の配列が返される（バグ）
 var voices = speechSynthesis.getVoices();
+console.log('[1]getVoices().length = ' + voices.length);
+if(voices.length){
+  document.querySelector('h1').innerHTML += '<span style="font-size:13px;color:#ccc">asSpecified</span>';
+}
 
 function getVoice(voiceName){
 
   // ②声質データを取得できてない場合は再取得する
   if(!voices || !voices.length){
     voices = speechSynthesis.getVoices();
+    console.log('[2]getVoices().length = ' + voices.length);
   }
   var voice;
   voices.forEach(function(_voice){
@@ -42,7 +47,7 @@ function speak(){
   var uttr = new SpeechSynthesisUtterance(text);
 
   //「イギリス人男性風の声質」を指定
-  var voice = getVoice('Google UK English Male');
+  var voice = getVoice('Alex');
 
   // 取得できた場合のみ適用する
   if(voice){
@@ -69,11 +74,7 @@ function fetchVoices(cb){
     !cb || cb(voices);
   }
 }
-fetchVoices();
-
-
-
-
+// fetchVoices();
 
 
 </script>
