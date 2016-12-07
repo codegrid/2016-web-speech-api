@@ -23,31 +23,14 @@ if(voices.length){
   document.querySelector('h1').innerHTML += '<span style="font-size:13px;color:#ccc">asSpecified</span>';
 }
 
-function getVoice(voiceName){
-
-  // ②声質データを取得できてない場合は再取得する
-  if(!voices || !voices.length){
-    voices = speechSynthesis.getVoices();
-    console.log('[2]getVoices().length = ' + voices.length);
-  }
-  var voice;
-  voices.forEach(function(_voice){
-
-    // ③指定された声質名か？
-    if(_voice.name === voiceName) voice = _voice;
-  });
-  return voice;
-}
-
-//====================================
-// 音声再生処理
-//====================================
 function speak(){
   var text = document.querySelector('.text').value;
   var uttr = new SpeechSynthesisUtterance(text);
 
   //「イギリス人男性風の声質」を指定
-  var voice = getVoice('Google UK English Male');
+  var voice = speechSynthesis.getVoices().find(function(_voice){
+    return _voice.name === 'Google UK English Male';
+  });
 
   // 取得できた場合のみ適用する
   if(voice){
@@ -63,17 +46,17 @@ function speak(){
     speechSynthesis.speak(uttr);
   });
 */
-function fetchVoices(cb){
-  if(!voices || !voices.length){
-    setTimeout(function(){
-      voices = speechSynthesis.getVoices();
-      fetchVoices(cb);
-    }, 0);
-  }
-  else{
-    !cb || cb(voices);
-  }
-}
+// function fetchVoices(cb){
+//   if(!voices || !voices.length){
+//     setTimeout(function(){
+//       voices = speechSynthesis.getVoices();
+//       fetchVoices(cb);
+//     }, 0);
+//   }
+//   else{
+//     !cb || cb(voices);
+//   }
+// }
 // fetchVoices();
 
 

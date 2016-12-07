@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="cache-control" content="no-cache">
     <meta name="viewport" content="width=device-width">
-    <title>Ting-Tingの音声のデモ | Web Speech API -> speechSynthesis</title>
+    <title>Alexの音声のデモ | Web Speech API -> speechSynthesis</title>
     <link rel='stylesheet' href='demo.css' type='text/css'/>
   </head>
   <body>
-<h1>Ting-Tingの音声のデモ</h1>
+<h1>Alexの音声のデモ</h1>
 <input class="text" value="Let's use Web Speech API"/>
 <button onclick="speak()">speak()</button>
 <script>
@@ -19,9 +19,9 @@ function speak(){
   var text = document.querySelector('.text').value;
   var uttr = new SpeechSynthesisUtterance(text);
 
-  //「イギリス人男性風の声質」を指定
+  //「Alexの声質」を指定
   var voice = speechSynthesis.getVoices().find(function(_voice){
-    return _voice.name === 'Ting-Ting';
+    return _voice.name === 'Alex';
   });
 
   // 取得できた場合のみ適用する
@@ -31,6 +31,7 @@ function speak(){
   }
   speechSynthesis.speak(uttr);
 }
+
 </script>
 
 
