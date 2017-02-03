@@ -1,0 +1,242 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>API Demo | Web Speech API -> SpeechRecognition</title>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+<style>
+body{
+  color: #555;
+  font-size: 12px;
+}
+h1{
+  font-size: 100%;
+  color: #ffcccc;
+}
+dl{
+  margin:0;
+}
+dd{
+  margin-left: 1em;
+}
+.audiostart{
+  background-color: #ffdddd;
+}
+.config-Area{
+  padding: 10px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100%;
+  background-color: #000;
+  color: #e0e0e0;
+}
+.config-Row{
+  padding: 4px 0;
+  display: flex;
+}
+.config-Row > div:first-child{
+  width: 60%;
+}
+.rec-Area{
+  margin-left: 200px;
+}
+.rec-Row{
+  display: flex;
+}
+.rec-EventName{
+  margin-right: 1em;
+  margin-bottom: 1px;
+  padding: 4px;
+  width: 80px;
+  background-color: #f0f0f0;
+}
+</style>
+  </head>
+  <body>
+    <div class="config-Area"></div>
+    <div class="rec-Area"></div>
+
+
+<script>
+window.SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+
+const Config = {
+  name: 'config-Area',
+  store: {
+    loopFlg: true,
+    lang: 'ja',
+    continuous: false,
+    maxAlternatives: 10,
+    interimResults: true
+  },
+  view: {
+    draw: () => {
+      const html = `
+        <h1>Speech recognition API</h1>
+        <div class="config-Row">
+          <button class="start" onclick="Rec.action.start()">start</button>
+          <button class="stop" onclick="Rec.action.stop()">stop</button>
+          <button class="abort" onclick="Rec.action.abort()">abort</button>
+          <label><input type="checkbox" ${Config.store.loopFlg ? 'checked' : ''} onChange="Config.action.onChange('loopFlg', this.checked)"/>loop</label>
+        </div>
+
+        <div class="config-Row">
+          <div>lang</div>
+          <div>
+            <select onChange="Config.action.onChange('lang', this.value)">
+              <option value="ja" ${Config.store.lang === 'ja' ? 'selected' : ''}>ja</option>
+              <option value="en" ${Config.store.lang === 'en' ? 'selected' : ''}>en</option>
+              <option value="en" ${Config.store.lang === 'en-US' ? 'selected' : ''}>en-US</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="config-Row">
+          <div>continuous</div>
+          <div>
+            <input type="checkbox" ${Config.store.continuous ? 'checked' : ''} onChange="Config.action.onChange('continuous', this.checked)"/>
+          </div>
+        </div>
+
+        <div class="config-Row">
+          <div>maxAlternatives</div>
+          <div>
+            <input type="number" style="width:50px;" value="${Config.store.maxAlternatives}" onChange="Config.action.onChange('maxAlternatives', this.value)"/>
+          </div>
+        </div>
+
+        <div class="config-Row">
+          <div>interimResults</div>
+          <div>
+            <input type="checkbox" ${Config.store.interimResults ? 'checked' : ''} onChange="Config.action.onChange('interimResults', this.checked)"/>
+          </div>
+        </div>
+      `;
+      document.querySelector('.'+Config.name).innerHTML = html;
+    }
+  },
+  action: {
+    onChange: (name, value) => {
+      Config.store[name] = value;
+      Config.view.draw();
+    }
+  }
+};
+
+const Rec = {
+  name: 'rec-Area',
+  store: {
+    events: [],
+    recognition: null
+  },
+  view: {
+    draw: () => {
+      const html = Rec.store.events.concat().map(getEventHtml).join('');
+      document.querySelector('.'+Rec.name).innerHTML = `<div>${html}</div>`;
+      document.body.scrollTop = 100000;
+
+      function getEventHtml(event){
+        var resultHtml = '';
+        if(event.results){
+          const speechRecognitionResultList = event.results;
+          resultHtml = [].map.call(speechRecognitionResultList, (speechRecognitionResult, listIndex) => {
+            const transcripts = [].map.call(speechRecognitionResult, (speechRecognitionAlternative, resultIndex) => {
+              return `<dd>${speechRecognitionAlternative.confidence} ${speechRecognitionAlternative.transcript}</dd>`;
+            }).join('');
+            return `
+              <dl>
+                <dt>resultIndex: ${event.resultIndex}</dt>
+                <dt>list.length: ${speechRecognitionResultList.length}</dt>
+                <dd>
+                  <dl>
+                    <dt>result.isFinal: ${speechRecognitionResult.isFinal}</dt>
+                    <dt>result.length: ${speechRecognitionResult.length}</dt>
+                    ${transcripts}
+                  </dl>
+                </dd>
+              </dl>
+            `;
+          }).join('');
+        }
+
+        return `
+          <div class="rec-Row">
+            <div class="rec-EventName">${event.type}</div>
+            <div class="data-EventData">${resultHtml}</div>
+          </div>
+        `;
+      }
+    }
+  },
+  action: {
+    start: () => {
+      const recognition = Rec.store.recognition = Rec.action.getSpeechRecognition();
+      recognition.start();
+    },
+    stop: () => {
+      Config.store.loopFlg = false;
+      Config.view.draw();
+      Rec.store.recognition.stop();
+    },
+    abort: () => {
+      Config.store.loopFlg = false;
+      Config.view.draw();
+      Rec.store.recognition.abort();
+    },
+    getSpeechRecognition: () => {
+      const events = Rec.store.events;
+
+      return (() => {
+        const recognition = new window.SpeechRecognition();
+        recognition.lang = Config.store.lang;
+        recognition.continuous = Config.store.continuous;
+
+        recognition.interimResults = Config.store.interimResults;
+        recognition.maxAlternatives = Config.store.maxAlternatives;
+
+        const eventNames = [
+          'audiostart',
+          'soundstart',
+          'speechstart',
+          'speechend',
+          'soundend',
+          'audioend',
+          'result',
+          'error',
+          'start',
+          'end'
+        ];
+        eventNames.forEach((eventName) => {
+          recognition.addEventListener(eventName, showEvent);
+        });
+
+        return recognition;
+      })();
+
+      function showEvent(event){
+        if(/^(audiostart|audioend)$/.test(event.type)){
+          document.body.classList[event.type === 'audioend' ? 'remove' : 'add'](event.type === 'audioend' ? 'audiostart' : event.type)
+        }
+        events.push(event);
+
+        Rec.view.draw();
+
+        if(event.type === 'end' && Config.store.loopFlg){
+          Rec.action.start();
+        }
+      }
+    }
+  }
+};
+
+Config.view.draw();
+
+</script>
+
+
+  </body>
+</html>

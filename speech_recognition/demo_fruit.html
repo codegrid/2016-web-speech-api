@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+<style>
+body{
+  text-align: center;
+  color: #555;
+  font-size: 12px;
+}
+.title-Area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+}
+
+.rec-Area{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100%;
+  overflow-y: auto;
+}
+.rec-MatchWord{
+  color: red;
+  font-size: 20px;
+}
+.img-Area img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  transition: transform 5s linear;
+}
+.img-Area img.hit {
+    transition: transform 0.5s linear;
+}
+.img-Area img.zoom{
+    transform: scale(300);
+}
+</style>
+  </head>
+  <body>
+    <div class="title-Area">
+      <div class="title-Desc">
+        <h1>音声認識フルーツ当てゲーム</h1>
+        <p>せまってくるフルーツの名前をPCに向かって言ってください</p>
+      </div>
+      <a href="javascript:start()">はじめる</a>
+    </div>
+    <div class="img-Area"></div>
+    <div class="rec-Area"></div>
+
+<script>
+
+var el = {
+  titleArea: document.querySelector('.title-Area'),
+  recArea: document.querySelector('.rec-Area'),
+  imgArea: document.querySelector('.img-Area')
+};
+
+var synthes = new SpeechSynthesisUtterance();
+var recognition = new webkitSpeechRecognition();
+var fruit;
+var recognizing;
+
+function initRecognition(){
+
+  recognition.lang = 'en';
+  recognition.interimResults = true;
+  recognition.continuous = true;
+  recognition.maxAlternatives = 10;
+  recognition.addEventListener('start', function(){
+    recognizing = true;
+  });
+  recognition.addEventListener('end', function(){
+    recognizing = false;
+    if(!speechSynthesis.speaking){
+      recognition.start();
+    }
+  });
+
+  recognition.addEventListener('result', function(event){
+    if(!speechSynthesis.speaking){
+      onVoiceMatch(event.results);
+    }
+  });
+
+  function onVoiceMatch(results){
+    var result = [];
+    [].forEach.call(results[0], function(alt){
+      result = result.concat(alt.transcript.split(' '));
+    });
+    var match;
+    result.forEach(function(text){
+      var _match = text.toLowerCase() === fruit.name.toLowerCase();
+      showVoice(text, _match);
+      if(!match && _match){
+        match = _match;
+        hitVoice();
+      }
+    });
+  }
+
+  function showVoice(text, match){
+    var elText = document.createElement('p');
+    elText.textContent = text;
+    el.recArea.appendChild(elText);
+    if(match){
+      elText.classList.add('rec-MatchWord');
+    }
+    el.recArea.scrollTop = 100000;
+  }
+
+  function hitVoice(){
+    fruit.img.classList.remove('zoom');
+    fruit.img.classList.add('hit');
+  }
+
+};
+
+
+
+function initFruit(){
+
+  synthes.lang = 'en';
+  synthes.addEventListener('start', function(){
+    recognition.stop();
+  });
+  synthes.addEventListener('end', function(){
+    if(!recognizing){
+      recognition.start();
+    }
+  });
+
+  return {
+    start: show
+  };
+
+  function speak(text){
+    synthes.text = text;
+    speechSynthesis.speak(synthes);
+  }
+
+  function show(){
+    var data = getData();
+    fruit = data[Math.floor(Math.random() * data.length)];
+    fruit.img = document.createElement('img');
+    fruit.img.setAttribute('src', './images/' + fruit.fileName);
+    el.imgArea.appendChild(fruit.img);
+    speak(fruit.name);
+    setTimeout(function(){
+      fruit.img.classList.add('zoom');
+      fruit.img.addEventListener('transitionend', function(){
+        fruit.img.parentElement.removeChild(fruit.img);
+        show();
+      });
+    }, 0);
+  }
+
+  function getData(){
+    return [
+      {
+        fileName: 'orange.png',
+        name: 'orange'
+      },
+      {
+        fileName: 'apple.png',
+        name: 'apple'
+      },
+      {
+        fileName: 'banana.jpg',
+        name: 'banana'
+      },
+      {
+        fileName: 'grape.png',
+        name: 'grape'
+      }
+    ];
+  }
+};
+
+function start(){
+  el.titleArea.style.display = 'none';
+  initRecognition();
+  initFruit().start();
+}
+
+
+
+
+</script>
+
+  </body>
+</html>

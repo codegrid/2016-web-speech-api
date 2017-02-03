@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>常に音声入力待ち状態にする | Web Speech API -> SpeechRecognition</title>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <link rel='stylesheet' href='demo.css' type='text/css'/>
+  </head>
+  <body>
+<div class="header-Area">
+  <h1>常に音声入力待ち状態にする</h1>
+  <div class="header-Tools">
+    <button class="startBtn" onclick="start()">開始</button>
+    <label><input name="lang" type="radio" value="en-US" checked onchange="onLangChanged(this.value)"/>en-US</label>
+    <label><input name="lang" type="radio" value="ja" onchange="onLangChanged(this.value)"/>ja</label>
+  </div>
+</div>
+<div class="console-Area"></div>
+<script src="console.js"></script>
+
+<script>
+var elStartBtn = document.querySelector('.startBtn');
+var voiceWaiting;
+var recognition;
+
+function init(lang){
+
+  recognition = new webkitSpeechRecognition();
+  recognition.lang = lang || 'en-US';
+  recognition.interimResults = true
+  recognition.continuous = true;
+  recognition.addEventListener('result', function(event){
+    var resultList = event.results;
+    for(var i = event.resultIndex; i < resultList.length; i++){
+      var result = resultList[i];
+      console.log(result[0].transcript);
+    }
+  });
+
+  recognition.addEventListener('start', function(event){
+    elStartBtn.textContent = '停止';
+    document.body.classList.add('sts-Rec');
+  });
+  recognition.addEventListener('end', function(event){
+    elStartBtn.textContent = '開始';
+    document.body.classList.remove('sts-Rec');
+    if(voiceWaiting){
+      recognition.start();
+    }
+  });
+}
+
+function start(){
+  if(elStartBtn.textContent === '開始'){
+    recognition.start();
+    voiceWaiting = true;
+  }
+  else {
+    recognition.stop();
+    voiceWaiting = false;
+  }
+}
+
+function onLangChanged(lang){
+  recognition.stop();
+  init(lang);
+}
+init();
+
+</script>
+
+
+  </body>
+</html>

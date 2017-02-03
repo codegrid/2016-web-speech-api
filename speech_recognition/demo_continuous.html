@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>連続音節認識 | Web Speech API -> SpeechRecognition</title>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <link rel='stylesheet' href='demo.css' type='text/css'/>
+  </head>
+  <body>
+<div class="header-Area">
+  <h1>連続音節認識</h1>
+  <div class="header-Tools">
+    <button class="startBtn" onclick="start()">開始</button>
+    <label><input name="lang" type="radio" value="en-US" checked onchange="onLangChanged(this.value)"/>en-US</label>
+    <label><input name="lang" type="radio" value="ja" onchange="onLangChanged(this.value)"/>ja</label>
+  </div>
+</div>
+<div class="console-Area"></div>
+<script src="console.js"></script>
+<script>
+var elStartBtn = document.querySelector('.startBtn');
+var recognition;
+
+function init(lang){
+
+  recognition = new webkitSpeechRecognition();
+  recognition.lang = lang || 'en-US';
+  recognition.continuous = true;
+  recognition.addEventListener('result', function(event){
+    var resultList = event.results;
+    for(var i = event.resultIndex; i < resultList.length; i++){
+      var result = resultList[i];
+      if(result.isFinal){
+        console.log(result[0].transcript);
+      }
+    }
+    document.body.scrollTop = 100000;
+  });
+
+  recognition.addEventListener('start', function(event){
+    elStartBtn.textContent = '停止';
+  });
+  recognition.addEventListener('end', function(event){
+    elStartBtn.textContent = '開始';
+  });
+}
+
+function start(){
+  if(elStartBtn.textContent === '開始'){
+    recognition.start();
+  }
+  else {
+    recognition.stop();
+  }
+}
+
+function onLangChanged(lang){
+  recognition.stop();
+  init(lang);
+}
+init();
+
+</script>
+
+
+  </body>
+</html>

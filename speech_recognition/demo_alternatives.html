@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>認識結果の候補と信頼度 | Web Speech API -> SpeechRecognition</title>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <link rel='stylesheet' href='demo.css' type='text/css'/>
+  </head>
+  <body>
+<div class="header-Area">
+  <h1>認識結果の候補と信頼度</h1>
+  <div class="header-Tools">
+    <button onclick="start()">開始</button>
+  </div>
+</div>
+<div class="console-Area"></div>
+<script src="console.js"></script>
+<script>
+function start(){
+  var recognition = new webkitSpeechRecognition();
+  recognition.maxAlternatives = 5;
+  recognition.lang = 'ja';
+  recognition.addEventListener('result', function(event){
+    var result = event.results[0];
+    for(var i = 0; i < result.length; i++){
+      var alt = result[i];
+      console.log(alt.confidence, alt.transcript);
+    }
+  });
+  recognition.start();
+}
+</script>
+  </body>
+</html>

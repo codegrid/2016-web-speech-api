@@ -1,0 +1,29 @@
+body{
+  font-size: 13px;
+}
+.header-Area{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.header-Area h1{
+  margin: 0;
+  padding: 10px;
+  font-size: 120%;
+  font-weight: normal;
+  color: #fff;
+  background-color: #555;
+}
+.header-Tools{
+  margin: 0;
+  padding: 10px;
+  background-color: #e0e0e0;
+}
+.console-Area{
+  margin-top: 100px;
+}
+.sts-Rec{
+  background-color: #ffcccc;
+}
