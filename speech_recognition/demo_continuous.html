@@ -40,9 +40,11 @@ function init(lang){
 
   recognition.addEventListener('start', function(event){
     elStartBtn.textContent = '停止';
+    document.body.classList.add('sts-Rec');
   });
   recognition.addEventListener('end', function(event){
     elStartBtn.textContent = '開始';
+    document.body.classList.remove('sts-Rec');
   });
 }
 
