@@ -29,7 +29,6 @@ function init(lang){
   recognition = new webkitSpeechRecognition();
   recognition.lang = lang || 'en-US';
   recognition.interimResults = true
-  recognition.continuous = true;
   recognition.addEventListener('result', function(event){
     var resultList = event.results;
     for(var i = event.resultIndex; i < resultList.length; i++){
